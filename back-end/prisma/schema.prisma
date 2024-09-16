@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id          Int       @id @default(autoincrement())  
+  name        String
+  email       String    @unique
+  password    String 
+  role        String    @default("user")
+  created_at  DateTime  @db.DateTime()
+  updated_at  DateTime  @db.DateTime()
+
+   posts Posts[] // menjadi relasi 1 user memiliki banyak posts
+}
+
+model Posts {
+  id          Int         @id @default(autoincrement())
+  title       String
+  category    String      @default("general")
+  created_at  DateTime    @db.DateTime()
+  updated_at  DateTime    @db.DateTime()
+
+  // Relasi: Setiap post terhubung ke user
+  user       Users    @relation(fields: [user_id], references: [id])
+  user_id    Int // Foreign key mengacu ke 'Users'
+
+  images Images[] // membuat relasi 1 post memiliki banyak images
+}
+
+model Images {
+  id          Int         @id @default(autoincrement())
+  title       String
+
+  image       Posts       @relation(fields: [post_id], references: [id])
+  post_id     Int
+  created_at  DateTime    @db.DateTime()
+  updated_at  DateTime    @db.DateTime()
+}
